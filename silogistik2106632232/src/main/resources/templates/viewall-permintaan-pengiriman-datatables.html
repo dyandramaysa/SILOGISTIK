@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+
+  <head>
+    <meta charset="UTF-8">
+    <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+    <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+    <title>View All Permintaan Pengiriman</title>
+</head>
+
+<body>
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+    <div class="container">
+      <div class="text-center pt-5">
+        <h2>Daftar Permintaan Pengiriman</h2>
+        <a th:href="@{/permintaan-pengiriman/tambah}" class="btn btn-primary">+ Tambah Permintaan Pengiriman</a>
+      </div>
+      <div class="table-responsive">
+        <table id="permintaanPengirimanTable" class="display">
+          <thead class="table-dark">
+            <tr>
+              <th class="text-center">#</th> <!-- Kolom nomor urut -->
+              <th class="text-center">Waktu Permintaan</th>
+              <th class="text-center">Nomor Pengiriman</th>
+              <th class="text-center">Nama Penerima</th>
+              <th class="text-center">Alamat Penerima</th>
+              <th class="text-center">Tanggal Pengiriman</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Loop untuk menampilkan data gudang -->
+            <tr th:each="permintaan, status : ${listPermintaanPengiriman}">
+              <td th:text="${status.index + 1}"></td> <!-- Menampilkan nomor urut -->
+              <td th:text="${#temporals.format(permintaan.waktuPermintaan, 'yyyy-MM-dd, HH:mm')}"></td>
+              <!-- <td th:text="${permintaan.waktuPermintaan}"></td> -->
+              <td th:text="${permintaan.nomorPengiriman}"></td>
+              <td th:text="${permintaan.namaPenerima}"></td>
+              <td th:text="${permintaan.alamatPenerima}"></td>
+              <td th:text="${permintaan.tanggalPengiriman}"></td>
+              <td>
+                <a type="button" class="btn btn-md btn-primary" th:href="@{/permintaan-pengiriman/{id}(id=${permintaan.id})}">Detail</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+          $('#permintaanPengirimanTable').DataTable({
+            "pagingType": "full_numbers",
+            "lengthMenu": [5, 10, 20], // Daftar pilihan jumlah tampilan
+            "pageLength": 10, // Jumlah item per halaman (bisa disesuaikan)
+            "ordering": false, // Menonaktifkan pengurutan pada kolom action
+            "rowCallback": function(row, data, index) {
+              var api = this.api();
+              var startIndex = api.page() * api.page.len();
+              var counter = startIndex + index + 1;
+              $('td:eq(0)', row).html(counter);
+            }
+          });
+      
+          // Apply custom CSS to change title column text color
+          $('#permintaanPengirimanTable thead th').css('color', 'black');
+        });
+      </script>
+  </body>
+</html>

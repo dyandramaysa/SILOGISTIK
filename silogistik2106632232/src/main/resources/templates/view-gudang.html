@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+  <title>View Gudang</title>
+</head>
+
+<body>
+  <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="card my-5">
+        <div class="card-header" th:style="'display: flex; justify-content: space-between; align-items: center;'">
+            <h3 class="fw-bold">Detail Gudang</h3>
+            <!-- <a href="@{'/gudang/' + ${gudang.id} + '/restock-barang'}" class="btn btn-primary">+ Restock Barang</a> -->
+            <a th:href="@{/gudang/{id}/restock-barang(id=${gudang.id})}" class="btn btn-primary">+ Restock Barang</a>
+
+        </div>
+        
+        <div class="card-body">
+          <div class="row text-left mb-2">
+            <p class="card-title" th:text="'Nama gudang: ' + ${gudang.nama}"></p>
+            <p class="card-title" th:text="'Alamat gudang: ' +  ${gudang.alamatGudang}"></p>
+          </div>
+
+          <div class="row text-left mb-2">
+            <h5 class="fw-bold">Daftar Barang Tersedia</h5>
+          </div>
+
+          <div class="row text-left mb-2">
+            <table id="detailGudangTable" class="display">
+              <thead>
+                <tr>
+                  <th>#</th> <!-- Kolom nomor urut -->
+                  <th>Sku</th>
+                  <th>Merk</th>
+                  <th>Stok</th>
+                  <th>Harga</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Loop untuk menampilkan data gudang -->
+                <tr th:each="barang, status : ${listBarang}">
+                  <td th:text="${status.index + 1}"></td> <!-- Menampilkan nomor urut -->
+                  <td>
+                    <a th:href="@{'/barang/' + ${barang.key.sku}}" th:text="${barang.key.sku}"></a>
+                  </td>
+                  <td th:text="${barang.key.merk}"></td>
+                  <td th:text="${barang.value}"></td>
+                  <td
+                      th:text="'Rp ' + ${#numbers.formatDecimal(barang.key.hargaBarang, 0, 'COMMA', 2, 'POINT')}"
+                    ></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>          
+        </div>
+      </div>
+    </div>
+    <div class="text-center m-3">
+      <a type="button" class="btn btn-primary btn-md" href="/gudang">Kembali</a>
+    </div>
+  </div>
+  <script>
+    $(document).ready(function() {
+      $('#detailGudangTable').DataTable({
+        "pagingType": "full_numbers",
+        "lengthMenu": [5, 10, 20], // Daftar pilihan jumlah tampilan
+        "pageLength": 5, // Jumlah item per halaman (bisa disesuaikan)
+        "ordering": false, // Menonaktifkan pengurutan pada kolom action
+        "rowCallback": function(row, data, index) {
+          var api = this.api();
+          var startIndex = api.page() * api.page.len();
+          var counter = startIndex + index + 1;
+          $('td:eq(0)', row).html(counter);
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

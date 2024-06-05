@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+  <title>Form Tambah Barang</title>
+</head>
+
+<body>
+  <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+  <div class="container">
+    <div class="card m-4 p-4">
+        <div class="card my-5">
+            <div class="card-header">
+                <h3 class="fw-bold">Tambah Barang</h3>
+            </div>
+            
+            <div class="card-body">
+              <form 
+                method="POST"  
+                th:action="@{'/barang/tambah'}"
+                th:object="${barangDTO}">
+                
+                <div class="row text-left mb-2">
+                    Merk Barang: <br>
+                    <input class="form-control" type="text" th:field="*{merk}" />
+                    <br><br>
+                    
+                    Tipe Barang: <br>
+                    <select th:field="*{tipeBarang}" class="form-select">
+                        <option value="1">Produk Elektronik</option>
+                            <option th:value="2">Pakaian & Aksesoris</option>
+                            <option th:value="3">Makanan & Minuman</option>
+                            <option th:value="4">Kosmetik</option>
+                            <option th:value="5">Perlengkapan Rumah</option>
+                    </select> 
+                    <br><br>
+
+                    Harga: <br>
+                    <input required class="form-control" type="number" th:field="*{hargaBarang}" />
+                    <br><br>
+                </div>
+                <!-- Button Cancel dan Submit -->
+                <a class="btn btn-danger" th:href="@{'/barang'}">Batal</a>                
+                <button class="btn btn-primary" type="submit">Submit</button>
+    
+              </form>
+            </div>          
+            </div>
+          </div>
+    </div>
+  </div>
+</body>
+</html>

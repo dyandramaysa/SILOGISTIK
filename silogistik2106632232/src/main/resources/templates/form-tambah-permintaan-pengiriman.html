@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+  <title>Form Buat Permintaan Pengiriman</title>
+</head>
+
+<body>
+  <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+  <div class="container">
+    <div class="card m-4 p-4">
+        <div class="card my-5">
+            <div class="card-header">
+                <h3 class="fw-bold">Buat Permintaan Pengiriman</h3>
+            </div>
+            
+            <div class="card-body">
+              <div class="row text-left mb-2">
+                <form 
+                    method="POST"  
+                    th:action="@{/permintaan-pengiriman/tambah}"
+                    th:object="${permintaanPengirimanDTO}">
+                    <!-- Row untuk + Tambah Barang -->
+                    <div class="row text-left mb-2">                      
+                        <div class="row my-2">
+                          <div class="col">
+                            Karyawan Bertugas:
+                            <select th:field="*{karyawan}" class="form-select">
+                              <div th:each="karyawan : ${listKaryawan}">
+                                  <option th:value="${karyawan.id}" th:text="${karyawan.nama}">
+                                  </option>
+                              </div>
+                            </select>  
+                          </div>
+                          <div class="col">
+                            Tanggal Pengiriman
+                            <input th:field="*{tanggalPengiriman}" type="date" class="form-control" placeholder="dd/mm/yyyy">
+                          </div>
+                        </div>
+
+                        <div class="row my-4">
+                          <div class="col">
+                            Nama Penerima:
+                            <input th:field="*{namaPenerima}" type="text" class="form-control" placeholder="Nama Penerima">  
+                          </div>
+                          <div class="col">
+                            Jenis Layanan:
+                            <select th:field="*{jenisLayanan}" class="form-select">
+                              <option th:value="1">Same Day</option>
+                              <option th:value="2">Kilat</option>
+                              <option th:value="3">Reguler</option>
+                              <option th:value="4">Hemat</option>
+                          </select> 
+                          </div>
+                        </div>
+
+                        <div class="row my-2">
+                          <div class="col">
+                            Alamat Penerima:
+                            <input th:field="*{alamatPenerima}" type="text" class="form-control" placeholder="Alamat Pengiriman">  
+                          </div>
+                          <div class="col">
+                            Biaya Pengiriman:
+                            <input th:field="*{biayaPengiriman}" type="text" class="form-control" placeholder="Biaya Pengiriman">  
+                          </div>
+                        </div>
+
+                        <div class="col text-end my-4">
+                          <button class="btn btn-primary" type="submit" name="addRow">+ Tambah Barang</button>
+                        </div>
+
+                        <table id="buatPPTable" class="display">
+                            <thead>
+                                <tr>
+                                <th>#</th> <!-- Kolom nomor urut -->
+                                <th>Barang</th>
+                                <th>Kuantitas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Loop untuk menampilkan data gudang -->
+                                <tr th:each="permintaan, iterationStatus : *{listPermintaanPengirimanBarang}">
+                                    <td th:text="${iterationStatus.index + 1}"></td> <!-- Menampilkan nomor urut -->
+                                    <td>
+                                        <select th:field="*{listPermintaanPengirimanBarang[__${iterationStatus.index}__].Barang.sku}" class="form-select">
+                                            <div th:each="barang : ${listBarang}">
+                                                <option th:value="${barang.sku}" th:text="${barang.merk}">
+                                                </option>
+                                            </div>
+                                        </select>                        
+                                    </td>
+                                    <td>
+                                        <input class="form-control" type="number" placeholder="Jumlah Barang"
+                                        th:field="*{listPermintaanPengirimanBarang[__${iterationStatus.index}__].kuantitasPengiriman}" th:value="0"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Button Cancel dan Submit -->
+                    <a class="btn btn-danger" th:href="@{/permintaan-pengiriman}">Batal</a>
+
+                    
+                    <button class="btn btn-primary" type="submit">Submit</button>
+        
+                </form>
+              </div>
+            </div>          
+            </div>
+          </div>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      $('#buatPPTable').DataTable({
+        "pagingType": "full_numbers",
+        "lengthMenu": [5, 10, 20], // Daftar pilihan jumlah tampilan
+        "pageLength": 5, // Jumlah item per halaman (bisa disesuaikan)
+        "ordering": false, // Menonaktifkan pengurutan pada kolom action
+        "searching" : false,
+        "rowCallback": function(row, data, index) {
+          var api = this.api();
+          var startIndex = api.page() * api.page.len();
+          var counter = startIndex + index + 1;
+          $('td:eq(0)', row).html(counter);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+  <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+  <title>View Permintaan Pengiriman</title>
+</head>
+
+<body>
+  <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="card my-5">
+        <div class="card-header" th:style="'display: flex; justify-content: space-between; align-items: center;'">
+            <h3 class="fw-bold">Detail Permintaan Pengiriman</h3>
+            <a th:if="${!pp.isCancelled}" th:href="@{'/permintaan-pengiriman/' + ${pp.id} + '/cancel'}" class="btn btn-danger">Cancel Permintaan</a>
+            <a th:if="${pp.isCancelled == true}" class="btn btn-danger" disabled>Permintaan Dihapus</a>
+        </div>
+        
+        <div class="card-body">
+          <div class="row text-left mb-2">
+            <p class="card-title" th:text="'No. Permintaan Pengiriman : ' + ${pp.nomorPengiriman}"></p>
+            <p class="card-title" th:text="'Waktu Permintaan : ' +  ${#temporals.format(pp.waktuPermintaan, 'yyyy-MM-dd, HH:mm')}"></p>
+            <p class="card-title" th:text="'Karyawan Bertugas : ' +  ${pp.karyawan.nama}"></p>
+            <p class="card-title" th:text="'Waktu Pengiriman : ' +  ${pp.tanggalPengiriman}"></p>
+            <p class="card-title" th:text="'Nama Penerima : ' +  ${pp.namaPenerima}"></p>
+            <p class="card-title" th:text="'Alamat Penerima : ' +  ${pp.alamatPenerima}"></p>
+            <p class="card-title">
+              <span th:if="${pp.jenisLayanan == 1}">Jenis Layanan : Same Day</span>
+              <span th:if="${pp.jenisLayanan == 2}">Jenis Layanan : Kilat</span>
+              <span th:if="${pp.jenisLayanan == 3}">Jenis Layanan : Reguler</span>
+              <span th:if="${pp.jenisLayanan == 4}">Jenis Layanan : Hemat</span>
+            </p>              
+            <p class="card-title" th:text="'Biaya Pengiriman : Rp ' +  ${pp.biayaPengiriman}"></p>
+          </div>
+
+          <div class="row text-left mb-2">
+            <h5 class="fw-bold">Daftar Barang Dipesan</h5>
+          </div>
+
+          <div class="row text-left mb-2">
+            <table id="detailBarangTable" class="display">
+              <thead>
+                <tr>
+                  <th>#</th> <!-- Kolom nomor urut -->
+                  <th>SKU</th>
+                  <th>Merk</th>
+                  <th>Kuantitas Pesanan</th>
+                  <th>Total Harga</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Loop untuk menampilkan data gudang -->
+                <tr th:each="barangPesan, status : ${barangPesanMap}">
+                  <td th:text="${status.index + 1}"></td> <!-- Menampilkan nomor urut -->
+                  <td>
+                    <a th:href="@{'/barang/' + ${barangPesan.key.barang.sku}}" th:text="${barangPesan.key.barang.sku}"></a>
+                  </td>
+                  <td th:text="${barangPesan.key.barang.merk}"></td>
+                  <td th:text="${barangPesan.key.kuantitasPengiriman}"></td>
+                  <!-- <td th:text="${barangPesan.value}"></td> -->
+                  <td th:text="'Rp ' + ${barangPesan.value}"></td>
+
+
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>          
+        </div>
+      </div>
+    </div>
+    <div class="text-center m-3">
+      <a type="button" class="btn btn-primary btn-md" href="/permintaan-pengiriman">Kembali</a>
+    </div>
+  </div>
+  <script>
+    $(document).ready(function() {
+      $('#detailBarangTable').DataTable({
+        "pagingType": "full_numbers",
+        "lengthMenu": [5, 10, 20], // Daftar pilihan jumlah tampilan
+        "pageLength": 5, // Jumlah item per halaman (bisa disesuaikan)
+        "ordering": false, // Menonaktifkan pengurutan pada kolom action
+        "rowCallback": function(row, data, index) {
+          var api = this.api();
+          var startIndex = api.page() * api.page.len();
+          var counter = startIndex + index + 1;
+          $('td:eq(0)', row).html(counter);
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

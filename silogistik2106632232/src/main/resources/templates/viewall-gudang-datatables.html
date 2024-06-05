@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+
+  <head>
+    <meta charset="UTF-8">
+    <object th:include="~{fragments/common :: js}" th:remove="tag"></object>
+    <object th:include="~{fragments/common :: css}" th:remove="tag"></object>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+    <title>View All Gudang</title>
+</head>
+
+<body>
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+    <div class="container">
+      <div class="text-center pt-5">
+        <h2>Daftar Gudang</h2>
+      </div>
+      <div class="table-responsive">
+        <table id="gudangTable" class="display">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th> <!-- Kolom nomor urut -->
+              <th>Nama</th>
+              <th>Alamat Gudang</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Loop untuk menampilkan data gudang -->
+            <tr th:each="gudang, status : ${listGudang}">
+              <td th:text="${status.index + 1}"></td> <!-- Menampilkan nomor urut -->
+              <td th:text="${gudang.nama}"></td>
+              <td th:text="${gudang.alamatGudang}"></td>
+              <td>
+                <a type="button" class="btn btn-md btn-primary" th:href="@{/gudang/{id}(id=${gudang.id})}">Detail</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+          $('#gudangTable').DataTable({
+            "pagingType": "full_numbers",
+            "lengthMenu": [5, 10, 20], // Daftar pilihan jumlah tampilan
+            "pageLength": 10, // Jumlah item per halaman (bisa disesuaikan)
+            "ordering": false, // Menonaktifkan pengurutan pada kolom action
+            "rowCallback": function(row, data, index) {
+              var api = this.api();
+              var startIndex = api.page() * api.page.len();
+              var counter = startIndex + index + 1;
+              $('td:eq(0)', row).html(counter);
+            }
+          });
+      
+          // Apply custom CSS to change title column text color
+          $('#gudangTable thead th').css('color', 'black');
+        });
+      </script>
+      
+  </body>
+</html>
